@@ -1,0 +1,16 @@
+# ==========================================================
+# 星海日记 —— MySQL 可选依赖
+#
+# 只有在把数据库从默认的 SQLite 切换到 MySQL 时才需要安装：
+#
+#     pip install -r requirements-mysql.txt
+#
+# 然后在项目根目录建一个 .env 文件，写入：
+#
+#     DATABASE_URL=mysql+pymysql://xinghai:密码@127.0.0.1:3306/xinghai_diary?charset=utf8mb4
+#
+# 建库脚本见 scripts/init_mysql.sql
+# 详细步骤见 README 第五章「切换到 MySQL」
+# ==========================================================
+
+PyMySQL>=1.1

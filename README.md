@@ -165,7 +165,8 @@ xinghai-diary/
 │   ├── smoke_test.py         # 后端端到端冒烟测试
 │   └── ui_test.py            # 界面层测试（Streamlit AppTest）
 ├── uploads/                  # 照片落盘目录（不进 git）
-├── requirements.txt
+├── requirements.txt          # 核心依赖（SQLite 模式只用这些）
+├── requirements-mysql.txt    # 可选依赖：MySQL 驱动
 ├── .env.example
 ├── .gitattributes            # 统一换行符，避免跨平台警告
 ├── 启动.bat                  # 一键启动
@@ -179,6 +180,9 @@ xinghai-diary/
 项目通过 SQLAlchemy 同时支持 SQLite 和 MySQL，**切换只改一行配置**。
 
 ```bash
+# 0. 安装 MySQL 驱动（它不在核心依赖里，要单独装，见下方说明）
+pip install -r requirements-mysql.txt
+
 # 1. 建库 + 建专用账号（不要用 root 跑应用）
 mysql -u root -p < scripts/init_mysql.sql
 
@@ -193,6 +197,17 @@ cp .env.example .env
 > 密码里含 `@` `:` `/` 等特殊字符时需要 URL 编码（`@` → `%40`）。
 
 改完直接 `streamlit run app.py`，SQLAlchemy 会连 MySQL 并自动建表，代码零改动。
+
+### 为什么 MySQL 驱动要单独拆一个文件？
+
+`PyMySQL` 没有放在 `requirements.txt` 里，而是单独放在 `requirements-mysql.txt`。原因：
+
+1. **按需加载** —— SQLite 模式根本用不到它。
+2. **云端发布限制（关键）** —— 发布沙箱只提供一个 HTTP 端口，不提供外部数据库。
+   只要核心依赖清单里出现 MySQL 驱动，整个项目就会被判定为"需要外部服务"而**拒绝发布**，
+   哪怕代码实际跑的是 SQLite。拆开之后云端发布才能通过。
+
+所以：本地只用 SQLite → 只装 `requirements.txt` 就够了。
 
 ---
 
