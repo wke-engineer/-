@@ -1,0 +1,15 @@
+# 统一换行符策略，避免 Windows / macOS / Linux 协作时满屏 "LF will be replaced by CRLF" 警告
+#
+# 规则：仓库里统一存 LF，检出到工作区时再按平台自动转
+* text=auto eol=lf
+
+# Windows 批处理文件必须用 CRLF，否则某些环境下执行会报错
+*.bat text eol=crlf
+
+# 二进制文件不做任何换行转换
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.gif binary
+*.db binary
