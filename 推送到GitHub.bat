@@ -3,20 +3,16 @@ chcp 65001 >nul
 REM ============================================================
 REM  星海日记 —— 一键推送到 GitHub
 REM
-REM  使用前只需做一件事：
-REM      在浏览器打开 https://github.com/new
-REM      仓库名填 xinghai-diary
-REM      私有/公开随你，但【不要】勾选 Add README / .gitignore / license
-REM      点 Create repository
-REM  然后双击本文件即可。
+REM  远程仓库已配置好，以后改完代码双击本文件即可同步。
+REM  目标： https://github.com/wke-engineer/-
 REM ============================================================
 
 setlocal
 cd /d "%~dp0"
 
 set REPO_USER=wke-engineer
-set REPO_NAME=xinghai-diary
-set REPO_URL=git@github.com:%REPO_USER%/%REPO_NAME%.git
+REM 注意：仓库名就是一个连字符，别改
+set REPO_URL=git@github.com:wke-engineer/-.git
 
 echo ============================================================
 echo   目标仓库: %REPO_URL%
@@ -62,13 +58,15 @@ if errorlevel 1 (
 )
 
 echo.
-echo [2/3] 检查远程仓库是否存在...
-git ls-remote --exit-code origin >nul 2>&1
-if errorlevel 1 (
+echo [2/3] 检查远程仓库是否可访问...
+REM 注意：这里不用 --exit-code。空仓库没有任何 ref，ls-remote 会返回 2，
+REM 会被误判成"仓库不存在"。直接看它有没有报 fatal 就够了。
+git ls-remote origin >"%TEMP%\xh_lsremote.txt" 2>&1
+findstr /C:"fatal" /C:"ERROR" "%TEMP%\xh_lsremote.txt" >nul
+if not errorlevel 1 (
     echo.
-    echo [错误] 读不到远程仓库。请确认：
-    echo        - 已经在 https://github.com/new 创建了名为 %REPO_NAME% 的空仓库
-    echo        - 仓库属于账号 %REPO_USER%
+    echo [错误] 读不到远程仓库，请确认仓库属于账号 %REPO_USER%
+    type "%TEMP%\xh_lsremote.txt"
     echo.
     pause
     exit /b 1
@@ -88,7 +86,7 @@ if errorlevel 1 (
 echo.
 echo ============================================================
 echo   推送完成！
-echo   https://github.com/%REPO_USER%/%REPO_NAME%
+echo   https://github.com/wke-engineer/-
 echo ============================================================
 echo.
 pause

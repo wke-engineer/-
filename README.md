@@ -218,31 +218,35 @@ python scripts/ui_test.py
 
 ## 七、推送到 GitHub
 
-本地仓库已经初始化好并完成了首次提交（分支 `main`，23 个文件）。推送分两步：
+**远程仓库**：<https://github.com/wke-engineer/->
 
-### 1. 在浏览器创建一个空仓库
+> 仓库名就是一个连字符 `-`。想改成 `xinghai-diary` 之类更直观的名字：
+> 打开 <https://github.com/wke-engineer/-/settings> → Repository name 改掉 → Rename。
+> GitHub 会自动重定向旧地址，但记得同步改 `推送到GitHub.bat` 里的 `REPO_URL`。
 
-打开 <https://github.com/new>：
+### 日常推送
 
-- Repository name 填 **`xinghai-diary`**
-- 私有 / 公开随你
-- **不要**勾选 `Add a README file`、`.gitignore`、`license`（否则会有历史冲突，还得先 pull）
+改完代码后，双击项目根目录的 **`推送到GitHub.bat`** 即可（自动配远程 + SSH 预检 + 推送）。
 
-### 2. 推送
-
-双击项目根目录的 **`推送到GitHub.bat`**，它会自动配好远程地址并推送。
-
-或者手动执行：
+或者手动：
 
 ```bash
-git remote add origin git@github.com:wke-engineer/xinghai-diary.git
+git add -A
+git commit -m "你的改动说明"
+git push
+```
+
+首次配置（已完成，一般不用再跑）：
+
+```bash
+git remote add origin git@github.com:wke-engineer/-.git
 git branch -M main
 git push -u origin main
 ```
 
-> ⚠️ **注意**：这台机器上 `github.com:443`（网页/HTTPS）是被网络阻断的（连接超时），
+> ⚠️ **注意**：这台机器上 `github.com:443`（网页 / HTTPS）是被网络阻断的（连接超时），
 > 但 `api.github.com:443` 和 `git@github.com:22`（SSH）是通的。
-> **所以必须用 SSH 推送，不要用 HTTPS。** 网页操作（建仓库）请在浏览器里做。
+> **所以必须用 SSH 推送，不要用 HTTPS。** 网页操作（建仓库、改设置）请在浏览器里做。
 
 ### 推送排障
 
@@ -250,8 +254,9 @@ git push -u origin main
 |---|---|---|
 | `Permission denied (publickey)` | 公钥没加到 GitHub | 把 `~/.ssh/id_ed25519.pub` 的内容贴到 GitHub → Settings → SSH and GPG keys |
 | `Connection timed out` / 卡住不动 | 22 端口被网络封了 | 改用 443 端口，见下方配置 |
+| `Repository not found` | 仓库名写错 / 没权限 | 确认 `git remote -v` 里的地址与 GitHub 上的实际仓库名完全一致 |
 | `remote origin already exists` | 重复添加远程 | `git remote remove origin` 后重试 |
-| `failed to push some refs` | 远程仓库不是空的 | 删掉远程仓库重建，或先 `git pull --rebase origin main` |
+| `failed to push some refs` | 远程有本地没有的提交 | 先 `git pull --rebase origin main` 再推 |
 
 **22 端口被封时，改用 SSH over 443**：编辑 `~/.ssh/config`（没有就新建），加入：
 
