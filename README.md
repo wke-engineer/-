@@ -167,7 +167,9 @@ xinghai-diary/
 ├── uploads/                  # 照片落盘目录（不进 git）
 ├── requirements.txt
 ├── .env.example
-└── 启动.bat
+├── .gitattributes            # 统一换行符，避免跨平台警告
+├── 启动.bat                  # 一键启动
+└── 推送到GitHub.bat          # 一键推送到 GitHub
 ```
 
 ---
@@ -214,7 +216,57 @@ python scripts/ui_test.py
 
 ---
 
-## 七、技术选型说明
+## 七、推送到 GitHub
+
+本地仓库已经初始化好并完成了首次提交（分支 `main`，23 个文件）。推送分两步：
+
+### 1. 在浏览器创建一个空仓库
+
+打开 <https://github.com/new>：
+
+- Repository name 填 **`xinghai-diary`**
+- 私有 / 公开随你
+- **不要**勾选 `Add a README file`、`.gitignore`、`license`（否则会有历史冲突，还得先 pull）
+
+### 2. 推送
+
+双击项目根目录的 **`推送到GitHub.bat`**，它会自动配好远程地址并推送。
+
+或者手动执行：
+
+```bash
+git remote add origin git@github.com:wke-engineer/xinghai-diary.git
+git branch -M main
+git push -u origin main
+```
+
+> ⚠️ **注意**：这台机器上 `github.com:443`（网页/HTTPS）是被网络阻断的（连接超时），
+> 但 `api.github.com:443` 和 `git@github.com:22`（SSH）是通的。
+> **所以必须用 SSH 推送，不要用 HTTPS。** 网页操作（建仓库）请在浏览器里做。
+
+### 推送排障
+
+| 现象 | 原因 | 解决 |
+|---|---|---|
+| `Permission denied (publickey)` | 公钥没加到 GitHub | 把 `~/.ssh/id_ed25519.pub` 的内容贴到 GitHub → Settings → SSH and GPG keys |
+| `Connection timed out` / 卡住不动 | 22 端口被网络封了 | 改用 443 端口，见下方配置 |
+| `remote origin already exists` | 重复添加远程 | `git remote remove origin` 后重试 |
+| `failed to push some refs` | 远程仓库不是空的 | 删掉远程仓库重建，或先 `git pull --rebase origin main` |
+
+**22 端口被封时，改用 SSH over 443**：编辑 `~/.ssh/config`（没有就新建），加入：
+
+```
+Host github.com
+    HostName ssh.github.com
+    Port 443
+    User git
+```
+
+改完用 `ssh -T git@github.com` 验证，看到 `Hi xxx! You've successfully authenticated` 就成了。
+
+---
+
+## 八、技术选型说明
 
 | 层 | 选型 | 为什么 |
 |---|---|---|
@@ -226,7 +278,7 @@ python scripts/ui_test.py
 
 ---
 
-## 八、后续路线（按周）
+## 九、后续路线（按周）
 
 | 阶段 | 目标 |
 |---|---|
@@ -238,7 +290,7 @@ python scripts/ui_test.py
 
 ---
 
-## 九、合规声明
+## 十、合规声明
 
 - 项目不含任何官方图片、音乐、视频、艺人物料。
 - 所有内容由用户自行上传，仅房间内成员可见。
